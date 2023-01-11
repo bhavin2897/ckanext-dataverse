@@ -33,7 +33,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
     implements(IHarvester)
 
-    _user_name = None
+    _user_name = "harvest"
 
     source_config = {}
 

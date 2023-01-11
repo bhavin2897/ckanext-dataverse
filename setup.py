@@ -28,7 +28,8 @@ setup(
     ],
     test_suite='nose.collector',
     entry_points="""
-        
+        [ckan.plugins]
+        dataverse_harvester=ckanext.dataverse.harvester:DataVerseHarvester
     """,
     message_extractors={
         'ckanext': [
