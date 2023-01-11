@@ -30,7 +30,7 @@ setup(
     entry_points=\
         """
         [ckan.plugins]
-        dataverse_harvester=ckanext.dataverse.harvester:DataVerseHarvester
+        dataverse_harvester=ckanext.dataverse.harvester.dataverse_harvester:DataVerseHarvester
     """,
     message_extractors={
         'ckanext': [
