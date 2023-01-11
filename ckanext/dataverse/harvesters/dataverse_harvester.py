@@ -55,7 +55,6 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         raise NotImplementedError
 
     def info(self):
-        def info(self):
             """
             Return information about this harvester.
             """
