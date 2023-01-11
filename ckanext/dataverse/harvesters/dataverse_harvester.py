@@ -37,6 +37,16 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
     source_config = {}
 
+    def info(self):
+            """
+            Return information about this harvester.
+            """
+            return {
+                "name": "Dataverse Harvester",
+                "title": "Dataverse Harvester",
+                "description": "Harvester for Dataverse",
+            }
+
     def harvester_name(self):
         raise NotImplementedError
 
@@ -54,15 +64,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
     def attach_resources(self, metadata, package_dict):
         raise NotImplementedError
 
-    def info(self):
-            """
-            Return information about this harvester.
-            """
-            return {
-                "name": "Dataverse Harvester",
-                "title": "Dataverse Harvester",
-                "description": "Harvester for Dataverse",
-            }
+
 
     ## IHarvester
 

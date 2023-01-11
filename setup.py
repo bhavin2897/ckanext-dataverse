@@ -27,7 +27,8 @@ setup(
         'mock',
     ],
     test_suite='nose.collector',
-    entry_points="""
+    entry_points=\
+        """
         [ckan.plugins]
         dataverse_harvester=ckanext.dataverse.harvester:DataVerseHarvester
     """,
