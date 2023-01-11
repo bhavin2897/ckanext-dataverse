@@ -55,7 +55,15 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         raise NotImplementedError
 
     def info(self):
-        raise NotImplementedError
+        def info(self):
+            """
+            Return information about this harvester.
+            """
+            return {
+                "name": "Dataverse Harvester",
+                "title": "Dataverse Harvester",
+                "description": "Harvester for Dataverse",
+            }
 
     ## IHarvester
 
