@@ -48,7 +48,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             }
 
     def harvester_name(self):
-        raise NotImplementedError
+        return "Dataverse Harvester"
 
     def create_index(self, url):
         """
