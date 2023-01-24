@@ -99,7 +99,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             doc_id = item.get(self.source_config['id_field_name'])
             log.info(f'Data: found {name} {description} {subjects}')
             guids.append(doc_id)
-            ret.append({'name': name, 'description': description, 'subjects': subjects, 'guid': global_id})
+            ret.append({'name': name, 'description': description, 'subjects': subjects, 'guid': doc_id})
 
         #TODO: Remove this
         log.debug(f'guids are {guids} and {ret} something I dont know')
