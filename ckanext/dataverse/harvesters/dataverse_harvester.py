@@ -87,10 +87,11 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
         return source_config
 
-    def _get_resources(self, url):
+    def _set_config(self, url):
         """ return name, descriptions and subjects """
-        filter_str = self.source_config('filter', '*')
-        final_url = f'{url}/api/search?q={filter_str}'
+
+        subject_str = self.source_config('subject')
+        final_url = f'{url}/api/search?q=*&type=datasets&fq=subject_ss:{subject_str}'
         log.info(f'Retrieving data from URL {url}')
         request = urlopen(final_url)
         content = request.read()
@@ -110,6 +111,8 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             guids.append(doc_id)
             ret.append({'name': name, 'description': description, 'subjects': subjects, 'guid': global_id})
 
+        #TODO: Remove this
+        log.info(f'guids are {guids} and {ret} something I dont know')
         return guids, ret
 
     def gather_stage(self, harvest_job):
@@ -121,7 +124,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         self._set_source_config(harvest_job.source.config)
 
         try:
-            local_guids, data = self._get_resources(url)
+            local_guids, data = self._set_config(url)
         except Exception as e:
             self._save_gather_error(f'Error harvesting {self.harvester_name()}: {harvest_job}')
             return None
