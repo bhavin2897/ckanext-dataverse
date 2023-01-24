@@ -77,7 +77,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
     def _set_config(self, url):
         """ return name, descriptions and subjects """
 
-        subject_str = self.source_config('subject')
+        subject_str = self.source_config.get('subject')
         final_url = f'{url}/api/search?q=*&type=datasets&fq=subject_ss:{subject_str}'
         log.info(f'Retrieving data from URL {url}')
         request = urlopen(final_url)
