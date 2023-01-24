@@ -78,15 +78,17 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         """ return name, descriptions and subjects """
 
         subject_str = self.source_config.get('subject')
-        final_url = f'{url}/api/search?q=*&type=dataset&fq=subject_ss:{subject_str}'
+        final_url = f'{url}/api/search?q=*&type=dataset&fq=subject_ss:{subject_str}&per_page=1000'
         #q = * & type = dataset & fq = subject_ss:Chemistry & metadata_fields = citation: *
+
         log.info(f'Retrieving data from URL {url}')
         request = urlopen(final_url)
         content = request.read()
 
         json_content = json.loads(content)
 
-        items = json_content['items']
+        datakey = json_content.get('data')
+        items = datakey['items']
         ret = []
         guids = []
 
