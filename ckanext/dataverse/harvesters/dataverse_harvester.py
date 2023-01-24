@@ -50,20 +50,6 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
     def harvester_name(self):
         return "Dataverse Harvester"
 
-    def create_index(self, url):
-        """
-        return an object exposing the methods:
-        - keys(): return all the keys of the harvested documents
-        - index.get_as_string(key): return the document entry related to a key
-        """
-        raise NotImplementedError
-
-    def create_package_dict(self, guid, content):
-        raise NotImplementedError
-
-    def attach_resources(self, metadata, package_dict):
-        raise NotImplementedError
-
 
 
     ## IHarvester
@@ -84,6 +70,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
         except ValueError as e:
             raise e
+        log.debug(source_config)
 
         return source_config
 
@@ -112,7 +99,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             ret.append({'name': name, 'description': description, 'subjects': subjects, 'guid': global_id})
 
         #TODO: Remove this
-        log.info(f'guids are {guids} and {ret} something I dont know')
+        log.debug(f'guids are {guids} and {ret} something I dont know')
         return guids, ret
 
     def gather_stage(self, harvest_job):
@@ -121,6 +108,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         # Get source URL
         url = harvest_job.source.url
 
+        log.debug("in gather stage: %s" % harvest_job.source.url)
         self._set_source_config(harvest_job.source.config)
 
         try:
