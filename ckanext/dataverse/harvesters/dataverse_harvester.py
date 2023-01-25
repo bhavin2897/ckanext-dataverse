@@ -8,7 +8,7 @@ from ckan import logic
 from ckan import model
 from ckan import plugins as p
 from ckan.common import config
-from ckan.model import Session
+
 
 from ckan.plugins.core import SingletonPlugin, implements
 
@@ -372,6 +372,9 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                     self._save_object_error(f'Validation Error: {e.error_summary} {harvest_object} Import')
                     return False
             model.Session.commit()
+            log.debug("Create/update package using dict: %s" % package_dict)
+            log.debug("Finished record")
+
 
         except Exception as e:
                     log.exception(e)
