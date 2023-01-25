@@ -24,7 +24,7 @@ from ckan.lib.search import rebuild
 
 from ckan.lib.search.index import PackageSearchIndex
 from ckan.lib.helpers import json
-from ckan.lib.navl.validators import not_empty,unicode
+from ckan.lib.navl.validators import not_empty
 
 log = logging.getLogger(__name__)
 
