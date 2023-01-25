@@ -317,62 +317,69 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         #TODO:self.attach_resources(metadata, package_dict)
 
         # Create / update the package
+        try:
+            context = {'model': model,
+                       'session': model.Session,
+                       'user': _user_name,
+                       'extras_as_string': True,
+                       'api_version': '2',
+                       'return_id_only': True}
 
-        context = {'model': model,
-                   'session': model.Session,
-                   'user': self._get_user_name(),
-                   'extras_as_string': True,
-                   'api_version': '2',
-                   'return_id_only': True}
-        if context['user'] ==  _user_name:
-            context['ignore_auth'] = True
 
-        # The default package schema does not like Upper case tags
-        tag_schema = logic.schema.default_tags_schema()
-        tag_schema['name'] = [not_empty, unicode]
+            # The default package schema does not like Upper case tags
+            tag_schema = logic.schema.default_tags_schema()
+            tag_schema['name'] = [not_empty, unicode]
 
-        if status == 'new':
-            package_schema = logic.schema.default_create_package_schema()
-            package_schema['tags'] = tag_schema
-            context['schema'] = package_schema
+            if status == 'new':
+                package_schema = logic.schema.default_create_package_schema()
+                package_schema['tags'] = tag_schema
+                context['schema'] = package_schema
 
-            # We need to explicitly provide a package ID, otherwise ckanext-spatial
-            # won't be be able to link the extent to the package.
-            package_dict['id'] = unicode(uuid.uuid4())
-            package_schema['id'] = [unicode]
+                # We need to explicitly provide a package ID, otherwise ckanext-spatial
+                # won't be be able to link the extent to the package.
+                package_dict['id'] = unicode(uuid.uuid4())
+                package_schema['id'] = [unicode]
 
-            # Save reference to the package on the object
-            harvest_object.package_id = package_dict['id']
-            harvest_object.add()
-            # Defer constraints and flush so the dataset can be indexed with
-            # the harvest object id (on the after_show hook from the harvester
-            # plugin)
-            Session.execute('SET CONSTRAINTS harvest_object_package_id_fkey DEFERRED')
-            model.Session.flush()
+                # Save reference to the package on the object
+                harvest_object.package_id = package_dict['id']
+                harvest_object.add()
+                # Defer constraints and flush so the dataset can be indexed with
+                # the harvest object id (on the after_show hook from the harvester
+                # plugin)
+                Session.execute('SET CONSTRAINTS harvest_object_package_id_fkey DEFERRED')
+                model.Session.flush()
 
-            try:
-                package_id = p.toolkit.get_action('package_create')(context, package_dict)
-                log.info(f'{self.harvester_name()}: Created new package {package_id} with guid {harvest_object.guid}')
-            except p.toolkit.ValidationError as e:
-                self._save_object_error(f'Validation Error: {e.error_summary} {harvest_object} Import')
-                return False
+                try:
+                    package_id = p.toolkit.get_action('package_create')(context, package_dict)
+                    log.info(f'{self.harvester_name()}: Created new package {package_id} with guid {harvest_object.guid}')
+                except p.toolkit.ValidationError as e:
+                    self._save_object_error(f'Validation Error: {e.error_summary} {harvest_object} Import')
+                    return False
 
-        elif status == 'change':
-            # we know the internal document did change, bc of a md5 hash comparison done above
+            elif status == 'change':
+                # we know the internal document did change, bc of a md5 hash comparison done above
 
-            package_schema = logic.schema.default_update_package_schema()
-            package_schema['tags'] = tag_schema
-            context['schema'] = package_schema
+                package_schema = logic.schema.default_update_package_schema()
+                package_schema['tags'] = tag_schema
+                context['schema'] = package_schema
 
-            package_dict['id'] = harvest_object.package_id
-            try:
-                package_id = p.toolkit.get_action('package_update')(context, package_dict)
-                log.info(f'{self.harvester_name()} updated package {package_id} with guid {harvest_object.guid}')
-            except p.toolkit.ValidationError as e:
-                self._save_object_error(f'Validation Error: {e.error_summary} {harvest_object} Import')
-                return False
+                package_dict['id'] = harvest_object.package_id
+                try:
+                    package_id = p.toolkit.get_action('package_update')(context, package_dict)
+                    log.info(f'{self.harvester_name()} updated package {package_id} with guid {harvest_object.guid}')
+                except p.toolkit.ValidationError as e:
+                    self._save_object_error(f'Validation Error: {e.error_summary} {harvest_object} Import')
+                    return False
+            model.Session.commit()
 
-        model.Session.commit()
+        except Exception as e:
+                    log.exception(e)
+                    self._save_object_error(
+                        "Exception in fetch stage for %s: %r / %s"
+                        % (harvest_object.guid, e, traceback.format_exc()),
+                        harvest_object,
+                    )
+                    return False
 
         return True
 
