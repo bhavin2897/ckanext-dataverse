@@ -2,7 +2,6 @@ import hashlib
 import logging
 import uuid
 from urllib.request import urlopen
-import unicode
 import traceback
 
 from ckan import logic
