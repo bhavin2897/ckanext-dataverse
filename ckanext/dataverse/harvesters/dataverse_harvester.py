@@ -50,10 +50,6 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
     def harvester_name(self):
         return "Dataverse Harvester"
 
-    def create_package_dict(self, guid, content):
-        raise NotImplementedError
-
-
     def attach_resources(self, metadata, package_dict):
         raise NotImplementedError
 
@@ -164,15 +160,15 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                     doc = d
                     break
             obj = HarvestObject(guid=guid, job=harvest_job, content=doc,
-                                package_id=guid_to_package_id[guid],
-                                extras=[HOExtra(key='status', value='change')])
+                                package_id=guid_to_package_id[guid],)
+                                #extras=[HOExtra(key='status', value='change')])
             obj.save()
             ids.append(obj.id)
 
         for guid in delete:
             obj = HarvestObject(guid=guid, job=harvest_job,
-                                package_id=guid_to_package_id[guid],
-                                extras=[HOExtra(key='status', value='delete')])
+                                package_id=guid_to_package_id[guid],)
+                                #extras=[HOExtra(key='status', value='delete')])
             ids.append(obj.id)
             model.Session.query(HarvestObject). \
                 filter_by(guid=guid). \
@@ -285,7 +281,12 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                 return True
 
         # Build the package dict
-        package_dict, metadata = self.create_package_dict(harvest_object.guid, harvest_object.content)
+        package_dict = {}
+        content = json.loads = harvest_object.content
+        log.debug(content)
+
+        #package_dict, metadata = self.create_package_dict(harvest_object.guid, harvest_object.content)
+
 
         if not package_dict:
             log.error('No package dict returned, aborting import for object {0}'.format(harvest_object.id))
