@@ -142,11 +142,11 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             doc = dict()
             for d in data:
                 if d['guid'] == guid:
-                    doc = d
+                    doc = json.dumps(d)
                     break
 
-            obj = HarvestObject(guid=guid, job=harvest_job,)
-                                #content=doc, extras=[HOExtra(key='status', value='new')])
+            obj = HarvestObject(guid=guid, job=harvest_job, content=doc,)
+                                 #extras=[HOExtra(key='status', value='new')])
 
             log.debug(obj)
             obj.save()
