@@ -2,6 +2,8 @@ import hashlib
 import logging
 import uuid
 from urllib.request import urlopen
+import unicode
+import traceback
 
 from ckan import logic
 from ckan import model
@@ -23,7 +25,7 @@ from ckan.lib.search import rebuild
 
 from ckan.lib.search.index import PackageSearchIndex
 from ckan.lib.helpers import json
-from ckan.lib.navl.validators import not_empty
+from ckan.lib.navl.validators import not_empty,unicode
 
 log = logging.getLogger(__name__)
 
