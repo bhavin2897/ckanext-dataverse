@@ -102,7 +102,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             ret.append({'name': name, 'description': description, 'subjects': subjects, 'guid': doc_id})
 
         #TODO: Remove this
-        log.debug(f'guids are {guids} and {ret} something I dont know')
+        log.debug(f'guids are {guids}')
         return guids, ret
 
     def gather_stage(self, harvest_job):
@@ -130,7 +130,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
         guids_in_db = set(guid_to_package_id.keys())
 
-        guids_in_harvest = local_guids
+        guids_in_harvest = set(local_guids)
 
         new = guids_in_harvest - guids_in_db
         delete = guids_in_db - guids_in_harvest
