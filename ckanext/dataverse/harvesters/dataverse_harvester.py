@@ -146,7 +146,8 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                     doc = json.dumps(d)
                     break
 
-            obj = HarvestObject(guid=guid, job=harvest_job, content=doc,)
+            obj = HarvestObject(
+                                guid=guid, job=harvest_job, content=doc,)
                                  #extras=[HOExtra(key='status', value='new')])
 
             log.debug(obj)
@@ -157,17 +158,18 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             doc = dict()
             for d in data:
                 if d['guid'] == guid:
-                    doc = d
+                    doc =json.dumps(d)
                     break
-            obj = HarvestObject(guid=guid, job=harvest_job, content=doc,)
-                                #package_id=guid_to_package_id[guid],)
+            obj = HarvestObject(guid=guid, job=harvest_job, content=doc,
+                                package_id=guid_to_package_id[guid],)
                                 #extras=[HOExtra(key='status', value='change')])
+
             obj.save()
             ids.append(obj.id)
 
         for guid in delete:
-            obj = HarvestObject(guid=guid, job=harvest_job,)
-                                #package_id=guid_to_package_id[guid],)
+            obj = HarvestObject(guid=guid, job=harvest_job,
+                                package_id=guid_to_package_id[guid],)
                                 #extras=[HOExtra(key='status', value='delete')])
             ids.append(obj.id)
             model.Session.query(HarvestObject). \
