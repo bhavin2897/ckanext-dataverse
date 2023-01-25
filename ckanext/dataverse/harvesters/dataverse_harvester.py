@@ -38,14 +38,14 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
     source_config = {}
 
     def info(self):
-            """
+        """
             Return information about this harvester.
             """
-            return {
-                "name": "Dataverse Harvester",
-                "title": "Dataverse Harvester",
-                "description": "Harvester for Dataverse",
-            }
+        return {
+            "name": "Dataverse Harvester",
+            "title": "Dataverse Harvester",
+            "description": "Harvester for Dataverse",
+        }
 
     def harvester_name(self):
         return "Dataverse Harvester"
@@ -80,7 +80,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
         subject_str = self.source_config.get('subject')
         final_url = f'{url}/api/search?q=*&type=dataset&fq=subject_ss:{subject_str}&per_page=1000'
-        #q = * & type = dataset & fq = subject_ss:Chemistry & metadata_fields = citation: *
+        # q = * & type = dataset & fq = subject_ss:Chemistry & metadata_fields = citation: *
 
         log.info(f'Retrieving data from URL {url}')
         request = urlopen(final_url)
@@ -147,8 +147,8 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                     break
 
             obj = HarvestObject(
-                                guid=guid, job=harvest_job, content=doc,)
-                                 #extras=[HOExtra(key='status', value='new')])
+                guid=guid, job=harvest_job, content=doc, )
+            # extras=[HOExtra(key='status', value='new')])
 
             log.debug(obj)
             obj.save()
@@ -158,19 +158,19 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             doc = dict()
             for d in data:
                 if d['guid'] == guid:
-                    doc =json.dumps(d)
+                    doc = json.dumps(d)
                     break
             obj = HarvestObject(guid=guid, job=harvest_job, content=doc,
-                                package_id=guid_to_package_id[guid],)
-                                #extras=[HOExtra(key='status', value='change')])
+                                package_id=guid_to_package_id[guid], )
+            # extras=[HOExtra(key='status', value='change')])
 
             obj.save()
             ids.append(obj.id)
 
         for guid in delete:
             obj = HarvestObject(guid=guid, job=harvest_job,
-                                package_id=guid_to_package_id[guid],)
-                                #extras=[HOExtra(key='status', value='delete')])
+                                package_id=guid_to_package_id[guid], )
+            # extras=[HOExtra(key='status', value='delete')])
             ids.append(obj.id)
             model.Session.query(HarvestObject). \
                 filter_by(guid=guid). \
@@ -204,7 +204,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             )
             return False
 
-        #self._set_source_config(harvest_object.source.config)
+        # self._set_source_config(harvest_object.source.config)
 
         status = self._get_object_extra(harvest_object, 'status')
 
@@ -284,24 +284,32 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
         # Build the package dict
         package_dict = {}
-        content = json.loads = harvest_object.content
+        content = json.loads(harvest_object.content)
         log.debug(content)
 
-        #package_dict, metadata = self.create_package_dict(harvest_object.guid, harvest_object.content)
+        # package_dict, metadata = self.create_package_dict(harvest_object.guid, harvest_object.content)
 
+        package_dict["id"] = munge_title_to_name(harvest_object.guid)
+        package_dict["name"] = package_dict["id"]
+
+        mapping = self._get_mapping()
+        for ckan_field, dataverse_field in mapping.items():
+            try:
+                package_dict[ckan_field] = content[dataverse_field][0]
+            except (IndexError, KeyError):
+                continue
 
         if not package_dict:
             log.error('No package dict returned, aborting import for object {0}'.format(harvest_object.id))
             return False
 
-        package_dict['name'] = self._gen_new_name(package_dict['title'])
 
         # We need to get the owner organization (if any) from the harvest source dataset
         source_dataset = model.Package.get(harvest_object.source.id)
         if source_dataset.owner_org:
             package_dict['owner_org'] = source_dataset.owner_org
 
-        self.attach_resources(metadata, package_dict)
+        #TODO:self.attach_resources(metadata, package_dict)
 
         # Create / update the package
 
@@ -374,7 +382,15 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         else:
             self.source_config = {}
 
+    def _get_mapping(self):
 
+        return {
+            "title": "name",
+            "notes": "description",
+            "maintainer": "publisher",
+            "type": "type",
+            "url": "url",
+        }
 
     def _get_object_extra(self, harvest_object, key):
         '''
