@@ -144,6 +144,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
             obj = HarvestObject(guid=guid, job=harvest_job, content=doc,
                                 extras=[HOExtra(key='status', value='new')])
+
             log.debug(type(obj))
             obj.save()
             ids.append(obj.id)
