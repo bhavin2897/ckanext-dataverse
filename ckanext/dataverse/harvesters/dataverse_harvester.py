@@ -50,7 +50,12 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
     def harvester_name(self):
         return "Dataverse Harvester"
 
+    def create_package_dict(self, guid, content):
+        raise NotImplementedError
 
+
+    def attach_resources(self, metadata, package_dict):
+        raise NotImplementedError
 
     ## IHarvester
 
