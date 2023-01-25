@@ -202,9 +202,9 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             )
             return False
 
-        self._set_source_config(harvest_object.source.config)
+        #self._set_source_config(harvest_object.source.config)
 
-        status = self._get_object_extra(harvest_object, 'status')
+        #status = self._get_object_extra(harvest_object, 'status')
 
         # Get the last harvested object (if any)
         previous_object = Session.query(HarvestObject) \
@@ -371,6 +371,8 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             log.debug(f'{self.harvester_name()} Using config: {self.source_config}')
         else:
             self.source_config = {}
+
+
 
     def _get_object_extra(self, harvest_object, key):
         '''
