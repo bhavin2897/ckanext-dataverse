@@ -97,7 +97,10 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             description = item.get('description')
             subjects = item.get('subjects')
             doc_id = item.get(self.source_config['id_field_name'])
-            log.info(f'Data: found {name} {description} {subjects}')
+
+            # This info below is about the Data found in each dataset
+            # log.info(f'Data: found {name} {description} {subjects}')
+
             guids.append(doc_id)
             ret.append({'name': name, 'description': description, 'subjects': subjects, 'guid': doc_id})
 
