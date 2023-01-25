@@ -204,7 +204,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
         #self._set_source_config(harvest_object.source.config)
 
-        #status = self._get_object_extra(harvest_object, 'status')
+        status = self._get_object_extra(harvest_object, 'status')
 
         # Get the last harvested object (if any)
         previous_object = Session.query(HarvestObject) \
