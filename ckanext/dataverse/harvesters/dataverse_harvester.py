@@ -371,8 +371,14 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                 except p.toolkit.ValidationError as e:
                     self._save_object_error(f'Validation Error: {e.error_summary} {harvest_object} Import')
                     return False
-            model.Session.commit()
+
             log.debug("Create/update package using dict: %s" % package_dict)
+            self._create_or_update_package(
+                package_dict, harvest_object, "package_show"
+            )
+            rebuild(package_dict["name"])
+
+            model.Session.commit()
             log.debug("Finished record")
 
 
