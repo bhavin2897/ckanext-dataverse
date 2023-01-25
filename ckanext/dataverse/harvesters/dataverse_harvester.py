@@ -320,7 +320,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         try:
             context = {'model': model,
                        'session': model.Session,
-                       'user': _user_name,
+                       'user': "harvest",
                        'extras_as_string': True,
                        'api_version': '2',
                        'return_id_only': True}
