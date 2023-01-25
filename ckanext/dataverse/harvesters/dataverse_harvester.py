@@ -329,7 +329,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
             # The default package schema does not like Upper case tags
             tag_schema = logic.schema.default_tags_schema()
-            tag_schema['name'] = [not_empty, unicode]
+            #tag_schema['name'] = [not_empty, unicode]
 
             if status == 'new':
                 package_schema = logic.schema.default_create_package_schema()
@@ -338,8 +338,8 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
                 # We need to explicitly provide a package ID, otherwise ckanext-spatial
                 # won't be be able to link the extent to the package.
-                package_dict['id'] = unicode(uuid.uuid4())
-                package_schema['id'] = [unicode]
+                #package_dict['id'] = unicode(uuid.uuid4())
+                #package_schema['id'] = [unicode]
 
                 # Save reference to the package on the object
                 harvest_object.package_id = package_dict['id']
