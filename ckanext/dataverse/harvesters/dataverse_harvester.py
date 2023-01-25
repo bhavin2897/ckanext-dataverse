@@ -101,8 +101,6 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             guids.append(doc_id)
             ret.append({'name': name, 'description': description, 'subjects': subjects, 'guid': doc_id})
 
-        #TODO: Remove this
-        log.debug(f'guids are {guids}')
         return guids, ret
 
     def gather_stage(self, harvest_job):
@@ -146,6 +144,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
             obj = HarvestObject(guid=guid, job=harvest_job, content=doc,
                                 extras=[HOExtra(key='status', value='new')])
+            log.debug(type(obj))
             obj.save()
             ids.append(obj.id)
 
