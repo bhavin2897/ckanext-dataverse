@@ -301,7 +301,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         mapping = self._get_mapping()
         for ckan_field, dataverse_field in mapping.items():
             try:
-                package_dict[ckan_field] = content[dataverse_field][0]
+                package_dict[ckan_field] = content[dataverse_field]
             except (IndexError, KeyError):
                 continue
 
