@@ -16,6 +16,11 @@ from ckanext.harvest.harvesters.base import HarvesterBase
 from ckanext.harvest.model import HarvestObject
 from ckanext.harvest.model import HarvestObjectExtra as HOExtra
 
+from ckan.lib.munge import munge_tag
+from ckan.lib.munge import munge_title_to_name
+from ckan.lib.search import rebuild
+
+
 from ckan.lib.search.index import PackageSearchIndex
 from ckan.lib.helpers import json
 from ckan.lib.navl.validators import not_empty
