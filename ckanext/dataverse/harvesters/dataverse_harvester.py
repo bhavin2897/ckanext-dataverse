@@ -324,7 +324,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                    'extras_as_string': True,
                    'api_version': '2',
                    'return_id_only': True}
-        if context['user'] == self._site_user['name']:
+        if context['user'] ==  _user_name:
             context['ignore_auth'] = True
 
         # The default package schema does not like Upper case tags
