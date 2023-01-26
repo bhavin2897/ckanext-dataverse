@@ -245,48 +245,53 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             return False
 
         # pre-check to skip resource logic in case no changes occurred remotely
-        if status == 'change':
+        try:
+            if status == 'change':
 
-            # Check if the document has changed
-            m = hashlib.md5()
-            m.update(previous_object.content)
-            old_md5 = m.hexdigest()
+                # Check if the document has changed
+                m = hashlib.md5()
+                m.update(previous_object.content)
+                old_md5 = m.hexdigest()
 
-            m = hashlib.md5()
-            m.update(harvest_object.content)
-            new_md5 = m.hexdigest()
+                m = hashlib.md5()
+                m.update(harvest_object.content)
+                new_md5 = m.hexdigest()
 
-            if old_md5 == new_md5:
 
-                # Assign the previous job id to the new object to # avoid losing history
-                harvest_object.harvest_job_id = previous_object.job.id
-                harvest_object.add()
+                if old_md5 == new_md5:
 
-                harvest_object.metadata_modified_date = previous_object.metadata_modified_date
-                harvest_object.add()
+                    # Assign the previous job id to the new object to # avoid losing history
+                    harvest_object.harvest_job_id = previous_object.job.id
+                    harvest_object.add()
 
-                # Delete the previous object to avoid cluttering the object table
-                previous_object.delete()
+                    harvest_object.metadata_modified_date = previous_object.metadata_modified_date
+                    harvest_object.add()
 
-                # Reindex the corresponding package to update the reference to the harvest object
-                context.update({'validate': False, 'ignore_auth': True})
-                try:
-                    package_dict = logic.get_action('package_show')(context,
-                                                                    {'id': harvest_object.package_id})
-                except p.toolkit.ObjectNotFound:
-                    pass
-                else:
-                    for extra in package_dict.get('extras', []):
-                        if extra['key'] == 'harvest_object_id':
-                            extra['value'] = harvest_object.id
-                    if package_dict:
-                        package_index = PackageSearchIndex()
-                        package_index.index_package(package_dict)
+                    # Delete the previous object to avoid cluttering the object table
+                    previous_object.delete()
 
-                log.info(f'{self.harvester_name()} document with GUID {harvest_object.id} unchanged, skipping...')
-                model.Session.commit()
+                    # Reindex the corresponding package to update the reference to the harvest object
+                    context.update({'validate': False, 'ignore_auth': True})
+                    try:
+                        package_dict = logic.get_action('package_show')(context,
+                                                                        {'id': harvest_object.package_id})
+                    except p.toolkit.ObjectNotFound:
+                        pass
+                    else:
+                        for extra in package_dict.get('extras', []):
+                            if extra['key'] == 'harvest_object_id':
+                                extra['value'] = harvest_object.id
+                        if package_dict:
+                            package_index = PackageSearchIndex()
+                            package_index.index_package(package_dict)
 
-                return True
+                    log.info(f'{self.harvester_name()} document with GUID {harvest_object.id} unchanged, skipping...')
+                    model.Session.commit()
+
+                    return True
+        except (TypeError) as e:
+            log.exception(e)
+            pass
 
         # Build the package dict
         package_dict = {}
