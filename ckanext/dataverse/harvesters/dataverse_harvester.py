@@ -153,8 +153,8 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                     break
 
             obj = HarvestObject(
-                guid=guid, job=harvest_job, content=doc, )
-            # extras=[HOExtra(key='status', value='new')])
+                guid=guid, job=harvest_job, content=doc,
+                extras=[HOExtra(key='status', value='new')])
 
             log.debug(obj)
             obj.save()
@@ -167,16 +167,16 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                     doc = json.dumps(d)
                     break
             obj = HarvestObject(guid=guid, job=harvest_job, content=doc,
-                                package_id=guid_to_package_id[guid], )
-            # extras=[HOExtra(key='status', value='change')])
+                                package_id=guid_to_package_id[guid],
+                                extras=[HOExtra(key='status', value='change')])
 
             obj.save()
             ids.append(obj.id)
 
         for guid in delete:
             obj = HarvestObject(guid=guid, job=harvest_job,
-                                package_id=guid_to_package_id[guid], )
-            # extras=[HOExtra(key='status', value='delete')])
+                                package_id=guid_to_package_id[guid],
+                                extras=[HOExtra(key='status', value='delete')])
             ids.append(obj.id)
             model.Session.query(HarvestObject). \
                 filter_by(guid=guid). \
@@ -413,6 +413,9 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             "type": "type",
             "url": "url",
         }
+
+    #def _extract_author(self, content):
+     #   return ", ".join(content["authors"])
 
     def _get_object_extra(self, harvest_object, key):
         '''
