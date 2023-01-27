@@ -216,6 +216,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         # self._set_source_config(harvest_object.source.config)
 
         status = self._get_object_extra(harvest_object, 'status')
+        log.debug(f'status : {status}')
 
         # Get the last harvested object (if any)
         previous_object = Session.query(HarvestObject) \
@@ -357,11 +358,6 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                 # plugin)
                 Session.execute('SET CONSTRAINTS harvest_object_package_id_fkey DEFERRED')
                 model.Session.flush()
-                log.debug("Create/update package using dict: %s" % package_dict)
-                self._create_or_update_package(
-                    package_dict, harvest_object, "package_show"
-                )
-                rebuild(package_dict["name"])
 
                 try:
                     package_id = p.toolkit.get_action('package_create')(context, package_dict)
