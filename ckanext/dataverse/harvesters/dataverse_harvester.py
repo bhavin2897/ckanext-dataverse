@@ -149,6 +149,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         for guid in new:
             doc = dict()
             for d in data:
+                log.debug(f"dguid:{d['guid']} and guid: {guid}")
                 if d['guid'] == guid:
                     doc = json.dumps(d)
                     break
