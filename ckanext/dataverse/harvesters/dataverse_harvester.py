@@ -100,7 +100,6 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         guids = []
 
         for item in items:
-        #
         #    name = item.get('value')
         #    description = item.get('description')
         #    subjects = item.get('subjects')
@@ -112,7 +111,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
             guids.append(doc_id)
             #ret.append({'name': name, 'description': description, 'subjects': subjects, 'guid': doc_id})
-
+        log.info(f'Gather info {ret}')
         return guids, ret
 
     def gather_stage(self, harvest_job):
@@ -246,54 +245,54 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                                     .format(harvest_object.id), harvest_object, 'Import')
             return False
 
-        # pre-check to skip resource logic in case no changes occurred remotely
-        try:
-            if status == 'change':
-
-                # Check if the document has changed
-                m = hashlib.md5()
-                m.update(previous_object.content)
-                old_md5 = m.hexdigest()
-
-                m = hashlib.md5()
-                m.update(harvest_object.content)
-                new_md5 = m.hexdigest()
-
-
-                if old_md5 == new_md5:
-
-                    # Assign the previous job id to the new object to # avoid losing history
-                    harvest_object.harvest_job_id = previous_object.job.id
-                    harvest_object.add()
-
-                    harvest_object.metadata_modified_date = previous_object.metadata_modified_date
-                    harvest_object.add()
-
-                    # Delete the previous object to avoid cluttering the object table
-                    previous_object.delete()
-
-                    # Reindex the corresponding package to update the reference to the harvest object
-                    context.update({'validate': False, 'ignore_auth': True})
-                    try:
-                        package_dict = logic.get_action('package_show')(context,
-                                                                        {'id': harvest_object.package_id})
-                    except p.toolkit.ObjectNotFound:
-                        pass
-                    else:
-                        for extra in package_dict.get('extras', []):
-                            if extra['key'] == 'harvest_object_id':
-                                extra['value'] = harvest_object.id
-                        if package_dict:
-                            package_index = PackageSearchIndex()
-                            package_index.index_package(package_dict)
-
-                    log.info(f'{self.harvester_name()} document with GUID {harvest_object.id} unchanged, skipping...')
-                    model.Session.commit()
-
-                    return True
-        except (TypeError) as e:
-            log.exception(e)
-            pass
+        ## pre-check to skip resource logic in case no changes occurred remotely
+        #try:
+        #    if status == 'change':
+        #
+        #        # Check if the document has changed
+        #        m = hashlib.md5()
+        #        m.update(previous_object.content)
+        #        old_md5 = m.hexdigest()
+        #
+        #        m = hashlib.md5()
+        #        m.update(harvest_object.content)
+        #        new_md5 = m.hexdigest()
+        #
+        #
+        #        if old_md5 == new_md5:
+        #
+        #            # Assign the previous job id to the new object to # avoid losing history
+        #            harvest_object.harvest_job_id = previous_object.job.id
+        #            harvest_object.add()
+        #
+        #            harvest_object.metadata_modified_date = previous_object.metadata_modified_date
+        #            harvest_object.add()
+        #
+        #            # Delete the previous object to avoid cluttering the object table
+        #            previous_object.delete()
+        #
+        #            # Reindex the corresponding package to update the reference to the harvest object
+        #            context.update({'validate': False, 'ignore_auth': True})
+        #            try:
+        #                package_dict = logic.get_action('package_show')(context,
+        #                                                                {'id': harvest_object.package_id})
+        #            except p.toolkit.ObjectNotFound:
+        #                pass
+        #            else:
+        #                for extra in package_dict.get('extras', []):
+        #                    if extra['key'] == 'harvest_object_id':
+        #                        extra['value'] = harvest_object.id
+        #                if package_dict:
+        #                    package_index = PackageSearchIndex()
+        #                    package_index.index_package(package_dict)
+        #
+        #            log.info(f'{self.harvester_name()} document with GUID {harvest_object.id} unchanged, skipping...')
+        #            model.Session.commit()
+        #
+        #            return True
+        #except (TypeError) as e:
+        #    log.exception(e)
+        #    pass
 
         # Build the package dict
         package_dict = {}
