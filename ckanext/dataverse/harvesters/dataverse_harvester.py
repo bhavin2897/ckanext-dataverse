@@ -110,7 +110,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             # log.info(f'Data: found {name} {description} {subjects}')
 
             guids.append(doc_id)
-            #ret.append({'name': name, 'description': description, 'subjects': subjects, 'guid': doc_id})
+            ret.append({'guid': doc_id})
         log.info(f'Gather info {ret}')
         return guids, ret
 
