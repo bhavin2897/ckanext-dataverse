@@ -154,7 +154,6 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                   doc = json.dumps(d)
                   break
 
-
             obj = HarvestObject(
                 guid=guid, job=harvest_job, content=doc,
                 extras=[HOExtra(key='status', value='new')])
@@ -216,7 +215,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         # self._set_source_config(harvest_object.source.config)
 
         status = self._get_object_extra(harvest_object, 'status')
-        log.debug(f'status : {status}')
+        log.debug(f'harvest : {harvest_object}')
 
         # Get the last harvested object (if any)
         previous_object = Session.query(HarvestObject) \
