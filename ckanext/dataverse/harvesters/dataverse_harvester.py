@@ -3,6 +3,7 @@ import logging
 import uuid
 from urllib.request import urlopen
 import traceback
+from collections import Counter
 
 from ckan import logic
 from ckan import model
@@ -99,16 +100,14 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         ret = []
         guids = []
         log.debug(type(items))
-        for item in items:
-        #    name = item.get('value')
-        #    description = item.get('description')
-        #    subjects = item.get('subjects')
 
+        for item in items:
+            each_itemData = Counter(item)
             doc_id = item.get(self.source_config['id_field_name'])
 
             # This info below is about the Data found in each dataset
             # log.info(f'Data: found {name} {description} {subjects}')
-
+            ret.append(dict(each_itemData))
             guids.append(doc_id)
             ret.append({'guid': doc_id})
         log.info(f'Gather info {ret}')
