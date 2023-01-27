@@ -96,9 +96,9 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
         datakey = json_content.get('data')
         items = datakey['items']
-        ret = [datakey]
+        ret = []
         guids = []
-
+        log.debug(type(items))
         for item in items:
         #    name = item.get('value')
         #    description = item.get('description')
