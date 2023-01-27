@@ -96,20 +96,22 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
         datakey = json_content.get('data')
         items = datakey['items']
-        ret = []
+        ret = json_content
         guids = []
 
         for item in items:
-            name = item.get('name')
-            description = item.get('description')
-            subjects = item.get('subjects')
+        #
+        #    name = item.get('value')
+        #    description = item.get('description')
+        #    subjects = item.get('subjects')
+
             doc_id = item.get(self.source_config['id_field_name'])
 
             # This info below is about the Data found in each dataset
             # log.info(f'Data: found {name} {description} {subjects}')
 
             guids.append(doc_id)
-            ret.append({'name': name, 'description': description, 'subjects': subjects, 'guid': doc_id})
+            #ret.append({'name': name, 'description': description, 'subjects': subjects, 'guid': doc_id})
 
         return guids, ret
 
