@@ -102,14 +102,17 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         log.debug(type(items))
 
         for item in items:
-            each_itemData = Counter(item)
-            doc_id = item.get(self.source_config['id_field_name'])
 
+            each_itemData = Counter(item)
+
+            doc_id = item.get(self.source_config['id_field_name'])
             # This info below is about the Data found in each dataset
             # log.info(f'Data: found {name} {description} {subjects}')
-            ret.append(dict(each_itemData))
+            temp_dict = dict(each_itemData)
+            temp_dict.update({'guid': doc_id})
+            ret.append(dict(temp_dict))
+
             guids.append(doc_id)
-            ret.append({'guid': doc_id})
         return guids, ret
 
     def gather_stage(self, harvest_job):
@@ -147,10 +150,9 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         for guid in new:
             doc = dict()
             for d in data:
-                log.debug(d)
-                #if d['global_id'] == guid:
-                 #   doc = json.dumps(d)
-                #    break
+                if d['global_id'] == guid:
+                  doc = json.dumps(d)
+                  break
 
 
             obj = HarvestObject(
