@@ -110,7 +110,6 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             ret.append(dict(each_itemData))
             guids.append(doc_id)
             ret.append({'guid': doc_id})
-        log.info(f'Gather info {ret}')
         return guids, ret
 
     def gather_stage(self, harvest_job):
@@ -143,14 +142,12 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         new = guids_in_harvest - guids_in_db
         delete = guids_in_db - guids_in_harvest
         change = guids_in_db & guids_in_harvest
-        log.debug(f'new: {new}, delete: {delete}, change:{change}')
 
         ids = []
         for guid in new:
             doc = dict()
             for d in data:
-                log.debug(f"dguid:{d['guid']} and guid: {guid}")
-                if d['guid'] == guid:
+                if d['global_id'] == guid:
                     doc = json.dumps(d)
                     break
 
@@ -165,7 +162,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         for guid in change:
             doc = dict()
             for d in data:
-                if d['guid'] == guid:
+                if d['global_id'] == guid:
                     doc = json.dumps(d)
                     break
             obj = HarvestObject(guid=guid, job=harvest_job, content=doc,
