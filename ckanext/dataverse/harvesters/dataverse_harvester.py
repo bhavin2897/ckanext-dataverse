@@ -142,7 +142,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         new = guids_in_harvest - guids_in_db
         delete = guids_in_db - guids_in_harvest
         change = guids_in_db & guids_in_harvest
-
+        log.debug(f'datanta start {data}')
         ids = []
         for guid in new:
             doc = dict()
