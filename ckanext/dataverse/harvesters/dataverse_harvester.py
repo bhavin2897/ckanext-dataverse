@@ -215,7 +215,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         # self._set_source_config(harvest_object.source.config)
 
         status = self._get_object_extra(harvest_object, 'status')
-        log.debug(f'harvest : {harvest_object}')
+
 
         # Get the last harvested object (if any)
         previous_object = Session.query(HarvestObject) \
@@ -323,7 +323,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         if source_dataset.owner_org:
             package_dict['owner_org'] = source_dataset.owner_org
 
-        #TODO:self.attach_resources(metadata, package_dict)
+        #self.attach_resources(metadata, package_dict)
 
         # Create / update the package
         try:
@@ -336,49 +336,52 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
 
             # The default package schema does not like Upper case tags
-            tag_schema = logic.schema.default_tags_schema()
-            #tag_schema['name'] = [not_empty, unicode]
-
-            if status == 'new':
-                package_schema = logic.schema.default_create_package_schema()
-                package_schema['tags'] = tag_schema
-                context['schema'] = package_schema
-
-                # We need to explicitly provide a package ID, otherwise ckanext-spatial
-                # won't be be able to link the extent to the package.
-                #package_dict['id'] = unicode(uuid.uuid4())
-                #package_schema['id'] = [unicode]
-
-                # Save reference to the package on the object
-                harvest_object.package_id = package_dict['id']
-                harvest_object.add()
-                # Defer constraints and flush so the dataset can be indexed with
-                # the harvest object id (on the after_show hook from the harvester
-                # plugin)
-                Session.execute('SET CONSTRAINTS harvest_object_package_id_fkey DEFERRED')
-                model.Session.flush()
-
-                try:
-                    package_id = p.toolkit.get_action('package_create')(context, package_dict)
-                    log.info(f'{self.harvester_name()}: Created new package {package_id} with guid {harvest_object.guid}')
-                except p.toolkit.ValidationError as e:
-                    self._save_object_error(f'Validation Error: {e.error_summary} {harvest_object} Import')
-                    return False
-
-            elif status == 'change':
-                # we know the internal document did change, bc of a md5 hash comparison done above
-
-                package_schema = logic.schema.default_update_package_schema()
-                package_schema['tags'] = tag_schema
-                context['schema'] = package_schema
-
-                package_dict['id'] = harvest_object.package_id
-                try:
-                    package_id = p.toolkit.get_action('package_update')(context, package_dict)
-                    log.info(f'{self.harvester_name()} updated package {package_id} with guid {harvest_object.guid}')
-                except p.toolkit.ValidationError as e:
-                    self._save_object_error(f'Validation Error: {e.error_summary} {harvest_object} Import')
-                    return False
+            #tag_schema = logic.schema.default_tags_schema()
+            ##tag_schema['name'] = [not_empty, unicode]
+            #
+            #if status == 'new':
+            #    package_schema = logic.schema.default_create_package_schema()
+            #    package_schema['tags'] = tag_schema
+            #    context['schema'] = package_schema
+            #
+            #    # We need to explicitly provide a package ID, otherwise ckanext-spatial
+            #    # won't be be able to link the extent to the package.
+            #    package_dict['id'] = unicode(uuid.uuid4())
+            #    package_schema['id'] = [unicode]
+            #
+            #    # Save reference to the package on the object
+            #    harvest_object.package_id = package_dict['id']
+            #    harvest_object.add()
+            #    # Defer constraints and flush so the dataset can be indexed with
+            #    # the harvest object id (on the after_show hook from the harvester
+            #    # plugin)
+            #    Session.execute('SET CONSTRAINTS harvest_object_package_id_fkey DEFERRED')
+            #    model.Session.flush()
+            #    self._create_or_update_package(
+            #        package_dict, harvest_object, "package_show"
+            #    )
+            #
+            #    try:
+            #        package_id = p.toolkit.get_action('package_create')(context, package_dict)
+            #        log.info(f'{self.harvester_name()}: Created new package {package_id} with guid {harvest_object.guid}')
+            #    except p.toolkit.ValidationError as e:
+            #        self._save_object_error(f'Validation Error: {e.error_summary} {harvest_object} Import')
+            #        return False
+            #
+            #elif status == 'change':
+            #    # we know the internal document did change, bc of a md5 hash comparison done above
+            #
+            #    package_schema = logic.schema.default_update_package_schema()
+            #    package_schema['tags'] = tag_schema
+            #    context['schema'] = package_schema
+            #
+            #    package_dict['id'] = harvest_object.package_id
+            #    try:
+            #        package_id = p.toolkit.get_action('package_update')(context, package_dict)
+            #        log.info(f'{self.harvester_name()} updated package {package_id} with guid {harvest_object.guid}')
+            #    except p.toolkit.ValidationError as e:
+            #        self._save_object_error(f'Validation Error: {e.error_summary} {harvest_object} Import')
+            #        return False
 
             log.debug("Create/update package using dict: %s" % package_dict)
             self._create_or_update_package(
