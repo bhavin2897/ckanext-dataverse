@@ -96,7 +96,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
         datakey = json_content.get('data')
         items = datakey['items']
-        ret = json_content
+        ret = [datakey]
         guids = []
 
         for item in items:
