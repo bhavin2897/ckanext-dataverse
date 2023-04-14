@@ -6,3 +6,4 @@ requests>=2.11.1
 ckan~=2.9.4
 setuptools~=57.0.0
 pytest~=6.2.5
+pyoai>=2.5.0

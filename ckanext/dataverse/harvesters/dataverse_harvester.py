@@ -27,6 +27,13 @@ from ckan.lib.search.index import PackageSearchIndex
 from ckan.lib.helpers import json
 from ckan.lib.navl.validators import not_empty
 
+
+import oaipmh.client
+from oaipmh.metadata import MetadataRegistry
+
+from ckanext.oaipmh.metadata import oai_ddi_reader
+from ckanext.oaipmh.metadata import oai_dc_reader
+
 log = logging.getLogger(__name__)
 
 
