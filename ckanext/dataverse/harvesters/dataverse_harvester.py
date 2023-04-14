@@ -10,6 +10,8 @@ from ckan import model
 from ckan import plugins as p
 from ckan.common import config
 from ckan.model import Session
+from ckan.logic import get_action
+
 
 from ckan.plugins.core import SingletonPlugin, implements
 
