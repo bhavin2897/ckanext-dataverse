@@ -638,29 +638,28 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             #log.debug("metadata  subject %s" ,metadata.getMap())
 
             content_dict = metadata.getMap()
+            log.debug("Subject are %s ", content_dict['subject'])
 
             for subject in content_dict['subject']:
                 try:
                     if subject == 'Chemistry':
                         log.debug('Chemistry data is being built')
-                        content_dict = metadata.getMap()
                         content_dict["set_spec"] = header.setSpec()
                         if metadata_modified:
                             content_dict["metadata_modified"] = metadata_modified
                         log.debug(content_dict)
                         content = json.dumps(content_dict)
+                        harvest_object.content = content
+                        harvest_object.save()
+                        log.debug("Only Chemsitry is dumped")
+                    break
+
                 except:
                         log.exception("Dumping the metadata failed!")
                         self._save_object_error(
                             "Dumping the metadata failed!", harvest_object
                         )
                         return False
-
-                harvest_object.content = content
-                harvest_object.save()
-                log.debug("Only Chemsitry is dumped")
-
-
 
 
         except (Exception) as e:
