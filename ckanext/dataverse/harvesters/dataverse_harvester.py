@@ -634,7 +634,15 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                 metadata_modified = None
                 
             #log.debug("Header data elemt  %s", header.element() )
-            log.debug("metadata  subject %s" ,metadata.getMap().subject)
+            #log.debug("metadata  subject %s" ,metadata.getMap())
+
+            contentsub = metadata.getMap()
+            for x in contentsub['subject']:
+                if x == 'Chemistry':
+                    log.debug('True its found chemistry')
+                else:
+                    log.debug("leider its %s", x )
+
 
             try:
                 content_dict = metadata.getMap()
