@@ -633,8 +633,8 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             except:
                 metadata_modified = None
                 
-            log.debug(header)
-            log.debug(metadata)
+            log.debug("Header data %s", header )
+            log.debug("metadata %s" ,metadata)
 
             try:
                 content_dict = metadata.getMap()
