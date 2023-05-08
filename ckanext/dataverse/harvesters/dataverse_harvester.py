@@ -652,7 +652,11 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                         harvest_object.content = content
                         harvest_object.save()
                         log.debug("Only Chemsitry is dumped")
-                    break
+                        break
+
+                    else:
+                        log.debug("Not chemistry metadata for %s", harvest_object)
+                        return False
 
                 except:
                         log.exception("Dumping the metadata failed!")
