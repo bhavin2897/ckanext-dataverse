@@ -636,30 +636,33 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             #log.debug("Header data elemt  %s", header.element() )
             #log.debug("metadata  subject %s" ,metadata.getMap())
 
-            contentsub = metadata.getMap()
-            for x in contentsub['subject']:
-                if x == 'Chemistry':
-                    log.debug('True its found chemistry')
+            content_dict = metadata.getMap()
+            for subject in content_dict['subject']:
+                if subject == 'Chemistry':
+                    log.debug('Chemistry data is being built')
+
+                try:
+                    content_dict = metadata.getMap()
+                    content_dict["set_spec"] = header.setSpec()
+                    if metadata_modified:
+                        content_dict["metadata_modified"] = metadata_modified
+                    log.debug(content_dict)
+                    content = json.dumps(content_dict)
+                except:
+                    log.exception("Dumping the metadata failed!")
+                    self._save_object_error(
+                        "Dumping the metadata failed!", harvest_object
+                    )
+                    return False
                 else:
-                    log.debug("leider its %s", x )
+                    log.debug("not chemistry for %s", harvest_object)
+
+                harvest_object.content = content
+                harvest_object.save()
+                log.debug("Only Chemsitry is dumped")
 
 
-            try:
-                content_dict = metadata.getMap()
-                content_dict["set_spec"] = header.setSpec()
-                if metadata_modified:
-                    content_dict["metadata_modified"] = metadata_modified
-                log.debug(content_dict)
-                content = json.dumps(content_dict)
-            except:
-                log.exception("Dumping the metadata failed!")
-                self._save_object_error(
-                    "Dumping the metadata failed!", harvest_object
-                )
-                return False
 
-            harvest_object.content = content
-            harvest_object.save()
 
         except (Exception) as e:
             log.exception(e)
