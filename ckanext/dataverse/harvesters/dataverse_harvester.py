@@ -637,13 +637,16 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             #log.debug("Header data elemt  %s", header.element() )
             #log.debug("metadata  subject %s" ,metadata.getMap())
 
+            ''' To Fetch only chemistry metadata from Dublin Core Subject. We fetch everything from using OAI-DC, then search for the subject.
+            If _Chemistry_ inside the array has an hit, then harvest only that DOI's metadata '''
+
+
             content_dict = metadata.getMap()
             log.debug("Subject are %s ", content_dict['subject'])
 
             for subject in content_dict['subject']:
                 try:
                     if subject == 'Chemistry':
-                        log.debug('Chemistry data is being built')
                         content_dict["set_spec"] = header.setSpec()
                         if metadata_modified:
                             content_dict["metadata_modified"] = metadata_modified
@@ -651,11 +654,11 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                         content = json.dumps(content_dict)
                         harvest_object.content = content
                         harvest_object.save()
-                        log.debug("Only Chemsitry is dumped")
+                        log.debug("Only Chemistry metadata is dumped")
                         break
 
                     else:
-                        log.debug("Not chemistry metadata for %s", harvest_object)
+                        log.info("Not chemistry metadata for %s", harvest_object.guid)
                         return False
 
                 except:
