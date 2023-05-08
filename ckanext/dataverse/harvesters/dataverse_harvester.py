@@ -91,26 +91,26 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 #
 #     return source_config
 #
-# def _set_config(self, url):
-#     """ return name, descriptions and subjects """
-#
-#     subject_str = self.source_config.get('subject')
-#     final_url = f'{url}/api/search?q=*&type=dataset&fq=subject_ss:{subject_str}&per_page=1000'
-#     # q = * & type = dataset & fq = subject_ss:Chemistry & metadata_fields = citation: *
-#
-#     log.info(f'Retrieving data from URL {url}')
-#     request = urlopen(final_url)
-#     content = request.read()
-#
-#     json_content = json.loads(content)
-#
-#     datakey = json_content.get('data')
-#     items = datakey['items']
-#     ret = []
-#     guids = []
-#     log.debug(type(items))
-#
-#     for item in items:
+#def _set_config(self, url):
+ #   """ return name, descriptions and subjects """
+
+  #  subject_str = self.source_config.get('subject')
+   # final_url = f'{url}/api/search?q=*&type=dataset&fq=subject_ss:{subject_str}&per_page=1000'
+    # q = * & type = dataset & fq = subject_ss:Chemistry & metadata_fields = citation: *
+
+    #log.info(f'Retrieving data from URL {url}')
+    #request = urlopen(final_url)
+#    content = request.read()
+
+#    json_content = json.loads(content)
+
+#    datakey = json_content.get('data')
+#    items = datakey['items']
+#    ret = []
+#    guids = []
+#    log.debug(type(items))
+
+  #  for item in items:
 #
 #         each_itemData = Counter(item)
 #
@@ -205,7 +205,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 #
 # def import_stage(self, harvest_object):
 #
-#     log = logging.getLogger(__name__ + '.import')
+#     log = logging.getLogger(__name__ + '.import')subject
 #     log.debug(f'{self.harvester_name()}: Import stage for harvest object: {harvest_object.id}')
 #
 #     if not harvest_object:
@@ -245,7 +245,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 #     if previous_object:
 #         previous_object.current = False
 #         previous_object.add()
-#
+#subject
 #     # Flag this object as the current one
 #     harvest_object.current = True
 #     harvest_object.add()
@@ -470,11 +470,9 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 #
 #     return self._user_name
 #
-
-
     def gather_stage(self, harvest_job):
         """
-        The gather stage will recieve a HarvestJob object and will be
+        The gather stage will receive a HarvestJob object and will be
         responsible for:
             - gathering all the necessary objects to fetch on a later.
               stage (e.g. for a CSW server, perform a GetRecords request)
@@ -629,13 +627,13 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                 return False
 
             header, metadata, _ = record
-            # TODO: drop
-            # from lxml.etree import dump
-            # breakpoint()
+
             try:
                 metadata_modified = header.datestamp().isoformat()
             except:
                 metadata_modified = None
+                
+            log.debug(header)
 
             try:
                 content_dict = metadata.getMap()
@@ -653,6 +651,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
             harvest_object.content = content
             harvest_object.save()
+
         except (Exception) as e:
             log.exception(e)
             self._save_object_error(
@@ -887,3 +886,6 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
         log.debug("Group ids: %s" % group_ids)
         return group_ids
+
+    #def _get_json_content(self, identifiers):
+
