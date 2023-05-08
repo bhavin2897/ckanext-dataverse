@@ -593,6 +593,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         :param harvest_object: HarvestObject object
         :returns: True if everything went right, False if errors were found
         """
+        content = None
         log.debug("in fetch stage: %s" % harvest_object.guid)
         try:
             self._set_config(harvest_object.job.source.config)
@@ -639,30 +640,25 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             content_dict = metadata.getMap()
 
             for subject in content_dict['subject']:
-                if subject == 'Chemistry':
-                    log.debug('Chemistry data is being built')
-                    try:
+                try:
+                    if subject == 'Chemistry':
+                        log.debug('Chemistry data is being built')
                         content_dict = metadata.getMap()
                         content_dict["set_spec"] = header.setSpec()
                         if metadata_modified:
                             content_dict["metadata_modified"] = metadata_modified
                         log.debug(content_dict)
                         content = json.dumps(content_dict)
-                    except:
+                except:
                         log.exception("Dumping the metadata failed!")
                         self._save_object_error(
                             "Dumping the metadata failed!", harvest_object
                         )
                         return False
 
-                    harvest_object.content = content
-                    harvest_object.save()
-                    log.debug("Only Chemsitry is dumped")
-
-                else:
-                    log.debug("not chemistry for %s", harvest_object)
-
-
+                harvest_object.content = content
+                harvest_object.save()
+                log.debug("Only Chemsitry is dumped")
 
 
 
