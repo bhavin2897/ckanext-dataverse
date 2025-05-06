@@ -12,7 +12,6 @@ from ckan.common import config
 from ckan.model import Session
 from ckan.logic import get_action
 
-
 from ckan.plugins.core import SingletonPlugin, implements
 
 from ckanext.harvest.interfaces import IHarvester
@@ -24,11 +23,9 @@ from ckan.lib.munge import munge_tag
 from ckan.lib.munge import munge_title_to_name
 from ckan.lib.search import rebuild
 
-
 from ckan.lib.search.index import PackageSearchIndex
 from ckan.lib.helpers import json
 from ckan.lib.navl.validators import not_empty
-
 
 import oaipmh.client
 from oaipmh.metadata import MetadataRegistry
@@ -43,7 +40,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
     '''
     Harvester per Dataverse
     GATHER: makes a request to the index service and saves each entry in a HarvestObject
-    FETCH:  read the HarvestObject, retrieve the metadata, update the content of the HarvestObject by adding the newly uploaded metadata
+    FETCH: read the HarvestObject, retrieve the metadata, update the content of the HarvestObject by adding the newly uploaded metadata
     IMPORT: parses the HarvestObject and creates / updates the corresponding dataset
     '''
 
@@ -52,9 +49,9 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
          Return information about this harvester.
          """
         return {
-         "name": "Dataverse Harvester",
-         "title": "Dataverse Harvester",
-         "description": "Harvester for Dataverse",
+            "name": "Dataverse Harvester",
+            "title": "Dataverse Harvester",
+            "description": "Harvester for Dataverse",
         }
 
     def harvester_name(self):
@@ -65,7 +62,7 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
         The gather stage will receive a HarvestJob object and will be
         responsible for:
             - gathering all the necessary objects to fetch on a later.
-              stage (e.g. for a CSW server, perform a GetRecords request)
+              Stage (e.g. for a CSW server, perform a GetRecords request)
             - creating the necessary HarvestObjects in the database, specifying
               the guid and a reference to its source and job.
             - creating and storing any suitable HarvestGatherErrors that may
@@ -91,14 +88,13 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                 harvest_obj = HarvestObject(
                     guid=header.identifier(), job=harvest_job
                 )
-                # TODO: drop
+
                 # if harvest_obj.guid != '10.14272/VIZKKYMOUGQEKZ-UHFFFAOYSA-L.1':
                 # continue
                 harvest_obj.save()
                 harvest_obj_ids.append(harvest_obj.id)
                 log.debug("Harvest obj %s created" % harvest_obj.id)
-                # TODO: drop
-                # return harvest_obj_ids
+
         except (HTTPError) as e:
             log.exception(
                 "Gather stage failed on %s (%s): %s, %s"
@@ -131,8 +127,8 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
     def _identifier_generator(self, client):
         """
-        pyoai generates the URL based on the given method parameters
-        Therefore one may not use the set parameter if it is not there
+        pyoai generates the URL based on the given method parameters;
+        Therefore, one may not use the set parameter if it is not there
         """
         if self.set_spec:
             for header in client.listIdentifiers(
@@ -223,16 +219,20 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                 metadata_modified = header.datestamp().isoformat()
             except:
                 metadata_modified = None
-                
-            #log.debug("Header data elemt  %s", header.element() )
-            #log.debug("metadata  subject %s" ,metadata.getMap())
 
-            ''' To Fetch only chemistry metadata from Dublin Core Subject. We fetch everything from using OAI-DC, then search for the subject.
-            If _Chemistry_ inside the array has an hit, then harvest only that DOI's metadata '''
+            # log.debug("Header data elemt  %s", header.element() )
+            # log.debug("metadata  subject %s" ,metadata.getMap())
 
+            """ To Fetch only chemistry metadata from Dublin Core Subject. We fetch everything from using OAI-DC, then search for the subject.
+            If _Chemistry_ inside the array has an hit, then harvest only that DOI's metadata """
 
-            content_dict = metadata.getMap()
-            log.debug("Subject are %s ", content_dict['subject'])
+            # TODO: What the hell is this? Why NONEType?
+
+            if metadata:
+                content_dict = metadata.getMap()
+                log.debug("Subject are %s ", content_dict['subject'])
+            else:
+                return False
 
             for subject in content_dict['subject']:
                 try:
@@ -252,11 +252,11 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                         return False
 
                 except:
-                        log.exception("Dumping the metadata failed!")
-                        self._save_object_error(
-                            "Dumping the metadata failed!", harvest_object
-                        )
-                        return False
+                    log.exception("Dumping the metadata failed!")
+                    self._save_object_error(
+                        "Dumping the metadata failed!", harvest_object
+                    )
+                    return False
 
 
         except (Exception) as e:
@@ -310,7 +310,6 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
             package_dict = {}
             content = json.loads(harvest_object.content)
-            log.debug(content)
 
             package_dict["id"] = munge_title_to_name(harvest_object.guid)
             package_dict["name"] = package_dict["id"]
@@ -337,6 +336,8 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
 
             # add resources
             url = self._get_possible_resource(harvest_object, content)
+            package_dict["url"] = url
+            package_dict["identifier"] = content['identifier']
             package_dict["resources"] = self._extract_resources(url, content)
 
             # extract tags from 'type' and 'subject' field
@@ -345,33 +346,22 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             package_dict["tags"] = tags
             package_dict["extras"] = extras
 
-            # # groups aka projects
-            # groups = []
-            #
-            # # create group based on set
-            # if content["set_spec"]:
-            #     log.debug("set_spec: %s" % content["set_spec"])
-            #     groups.extend(
-            #         {"id": group_id}
-            #         for group_id in self._find_or_create_groups(
-            #             content["set_spec"], context.copy()
-            #         )
-            #     )
-            #
-            # # add groups from content
-            # groups.extend(
-            #     {"id": group_id}
-            #     for group_id in self._extract_groups(content, context.copy())
-            # )
+            # groups aka projects are empty, as we are not dealing with them. as only Chemistry data is being harvested
+            groups = []
 
-            # package_dict["groups"] = groups
-
-            # allow sub-classes to add additional fields
+            # allow subclasses to add additional fields
             package_dict = self._extract_additional_fields(
                 content, package_dict
             )
 
             log.debug("Create/update package using dict: %s" % package_dict)
+
+            # Force update Package
+            existing = get_action('package_show')(context, {'id': package_dict['id']})
+            if existing.get('doi'):
+                get_action('package_update')(context, package_dict)
+                log.info(f"{package_dict['name']} is Force Updated")
+
             self._create_or_update_package(
                 package_dict, harvest_object, "package_show"
             )
@@ -395,7 +385,11 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             "notes": "description",
             "maintainer": "publisher",
             "maintainer_email": "maintainer_email",
-            "url": "source",
+            "url": "url",
+            "language": "language",
+            "metadata_modified": "metadata_modified",
+            "author": "creator",
+            "doi": "identifier"
         }
 
     def _extract_author(self, content):
@@ -464,10 +458,10 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             )
         return resources
 
-    def _extract_groups(self, content, context):
-        if "series" in content and len(content["series"]) > 0:
-            return self._find_or_create_groups(content["series"], context)
-        return []
+    # def _extract_groups(self, content, context):
+    #     if "series" in content and len(content["series"]) > 0:
+    #         return self._find_or_create_groups(content["series"], context)
+    #     return []
 
     def _extract_additional_fields(self, content, package_dict):
         # This method is the ideal place for sub-classes to
@@ -494,5 +488,4 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
     #     log.debug("Group ids: %s" % group_ids)
     #     return group_ids
 
-    #def _get_json_content(self, identifiers):
-
+    # def _get_json_content(self, identifiers):
