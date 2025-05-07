@@ -362,11 +362,12 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
                 get_action('package_update')(context, package_dict)
                 log.info(f"{package_dict['name']} is Force Updated")
 
-            self._create_or_update_package(
-                package_dict, harvest_object, "package_show"
-            )
-            rebuild(package_dict["name"])
-            Session.commit()
+            else:
+                self._create_or_update_package(
+                    package_dict, harvest_object, "package_show"
+                )
+                rebuild(package_dict["name"])
+                Session.commit()
 
             log.debug("Finished record")
         except (Exception) as e:
