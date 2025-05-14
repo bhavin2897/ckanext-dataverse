@@ -357,12 +357,20 @@ class DataVerseHarvester(HarvesterBase, SingletonPlugin):
             log.debug("Create/update package using dict: %s" % package_dict)
 
             # Force update Package
-            existing = get_action('package_show')(context, {'id': package_dict['id']})
-            if existing.get('doi'):
-                get_action('package_update')(context, package_dict)
-                log.info(f"{package_dict['name']} is Force Updated")
+            try:
+                existing = get_action("package_show")(context, {'id': package_dict['id']})
+                if existing.get('doi'):
+                    get_action('package_update')(context, package_dict)
+                    log.info(f"{package_dict['name']} is Force Updated")
 
-            else:
+                else:
+                    self._create_or_update_package(
+                        package_dict, harvest_object, "package_show"
+                    )
+                    rebuild(package_dict["name"])
+                    Session.commit()
+            except Exception as e:
+                log.error(f"an error for using package_show {e}")
                 self._create_or_update_package(
                     package_dict, harvest_object, "package_show"
                 )
